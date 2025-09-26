@@ -5,6 +5,3 @@ compatibility_date = "2024-09-26"
 [observability]
 enabled = true
 
-[vars]
-OPENAI_API_KEY = ""
-
