@@ -1,12 +1,27 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 function App() {
   const [imagePreview, setImagePreview] = useState(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysis, setAnalysis] = useState('')
+  const [installEvent, setInstallEvent] = useState(null)
+  const [isStandalone, setIsStandalone] = useState(false)
 
   const workerBase = 'https://foodtracker-api.hpepz.workers.dev'
+
+  useEffect(() => {
+    // Detect standalone (installed)
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true
+    setIsStandalone(standalone)
+    // Capture install event (Android/Chrome)
+    function onBeforeInstallPrompt(e) {
+      e.preventDefault()
+      setInstallEvent(e)
+    }
+    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+  }, [])
 
   async function onPickFile(event) {
     const file = event.target.files?.[0]
@@ -42,6 +57,32 @@ function App() {
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
+      {!isStandalone && (
+        <div style={{ background: '#e6f7ff', border: '1px solid #b3e5fc', padding: 12, borderRadius: 8, marginBottom: 16 }}>
+          <strong>Instale o app:</strong>
+          {installEvent ? (
+            <>
+              <span style={{ marginLeft: 8 }}>Toque para instalar no seu dispositivo.</span>
+              <button
+                style={{ marginLeft: 12 }}
+                onClick={async () => {
+                  try {
+                    await installEvent.prompt()
+                    const choice = await installEvent.userChoice
+                    if (choice && choice.outcome === 'accepted') {
+                      setInstallEvent(null)
+                    }
+                  } catch {}
+                }}
+              >Instalar</button>
+            </>
+          ) : (
+            <span style={{ marginLeft: 8 }}>
+              No iPhone/iPad: toque em Compartilhar → "Adicionar à Tela de Início".
+            </span>
+          )}
+        </div>
+      )}
       <h1>FoodTracker</h1>
       <p>Envie uma foto da refeição para estimar ingredientes, calorias e macros.</p>
 
