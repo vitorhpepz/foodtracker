@@ -52,12 +52,12 @@ async function handleChat(request, env) {
       return new Response(JSON.stringify({ error: 'messages array required' }), { status: 400, headers })
     }
     const payload = {
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-nano',
       temperature: typeof temperature === 'number' ? temperature : 0.2,
       messages: [
-        system ? { role: 'system', content: system } : null,
+        { role: 'system', content: system || 'Você é um assistente de nutrição. Responda sempre em português de forma clara e direta.' },
         ...messages,
-      ].filter(Boolean),
+      ],
     }
 
     const resp = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -93,17 +93,17 @@ async function handleVision(request, env) {
       : { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${imageBase64}` } }
 
     const payload = {
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-nano',
       temperature: typeof temperature === 'number' ? temperature : 0.2,
       messages: [
         {
           role: 'system',
-          content: 'You analyze meal photos to identify ingredients and estimate calories/macros. Be concise and include a bullet list of ingredients with estimated grams and macros per item, plus a total summary. If uncertainty is high, state assumptions.'
+          content: 'Você analisa fotos de refeições para identificar ingredientes e estimar calorias/macros. Responda em português com:\n- Lista de ingredientes (com gramas estimados)\n- Macros por item (kcal, proteína, carboidratos, gorduras)\n- Resumo total\nCaso a incerteza seja alta, explique as suposições.'
         },
         {
           role: 'user',
           content: [
-            { type: 'text', text: prompt || 'Analyze this meal photo.' },
+            { type: 'text', text: prompt || 'Analise esta foto da refeição.' },
             imageContent,
           ],
         },
