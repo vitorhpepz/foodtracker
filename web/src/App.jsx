@@ -26,7 +26,23 @@ function App() {
       setInstallEvent(e)
     }
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+    // Hide banner when app gets installed
+    function onAppInstalled() {
+      setIsStandalone(true)
+      setInstallEvent(null)
+    }
+    window.addEventListener('appinstalled', onAppInstalled)
+    // React to display-mode changes (some browsers update this at runtime)
+    const mm = window.matchMedia('(display-mode: standalone)')
+    function onDisplayModeChange(e) {
+      if (e.matches) setIsStandalone(true)
+    }
+    mm.addEventListener?.('change', onDisplayModeChange)
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+      window.removeEventListener('appinstalled', onAppInstalled)
+      mm.removeEventListener?.('change', onDisplayModeChange)
+    }
   }, [])
 
   async function onPickFile(event) {
@@ -87,14 +103,11 @@ function App() {
               </p>
             )}
             {platform === 'ios' && (
-              <details style={{ marginTop: 6 }}>
-                <summary style={{ cursor: 'pointer' }}>Passo a passo no iPhone/iPad</summary>
-                <ol style={{ marginTop: 6, paddingLeft: 18 }}>
-                  <li>Toque no botão Compartilhar (ícone de quadrado com seta para cima).</li>
-                  <li>Role a lista e toque em "Adicionar à Tela de Início".</li>
-                  <li>Confirme tocando em "Adicionar".</li>
-                </ol>
-              </details>
+              <ol style={{ marginTop: 6, paddingLeft: 18 }}>
+                <li>Toque no botão Compartilhar (ícone de quadrado com seta para cima).</li>
+                <li>Role a lista e toque em "Adicionar à Tela de Início".</li>
+                <li>Confirme tocando em "Adicionar".</li>
+              </ol>
             )}
             {platform === 'web' && (
               <p style={{ margin: 0 }}>Use o menu do navegador para "Instalar" ou "Adicionar à Tela de Início".</p>
