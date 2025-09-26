@@ -51,9 +51,9 @@ async function handleChat(request, env) {
     if (!Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: 'messages array required' }), { status: 400, headers })
     }
-    // Use gpt-5-mini for chat
+    
     const payload = {
-      model: 'gpt-5-mini',
+      model: 'gpt-5',
       temperature: typeof temperature === 'number' ? temperature : 0.2,
       messages: [
         { role: 'system', content: system || 'Você é um assistente de nutrição. Responda sempre em português de forma clara e direta.' },
@@ -95,7 +95,7 @@ async function handleVision(request, env) {
 
     // Vision requires a multimodal-capable model
     const payload = {
-      model: 'gpt-4o-mini',
+      model: 'gpt-5',
       temperature: typeof temperature === 'number' ? temperature : 0.2,
       messages: [
         {
