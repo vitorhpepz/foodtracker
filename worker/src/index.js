@@ -51,8 +51,9 @@ async function handleChat(request, env) {
     if (!Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: 'messages array required' }), { status: 400, headers })
     }
+    // Use gpt-5-mini for chat
     const payload = {
-      model: 'gpt-5-nano',
+      model: 'gpt-5-mini',
       temperature: typeof temperature === 'number' ? temperature : 0.2,
       messages: [
         { role: 'system', content: system || 'Você é um assistente de nutrição. Responda sempre em português de forma clara e direta.' },
@@ -92,8 +93,9 @@ async function handleVision(request, env) {
       ? { type: 'image_url', image_url: { url: imageUrl } }
       : { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${imageBase64}` } }
 
+    // Vision requires a multimodal-capable model
     const payload = {
-      model: 'gpt-5-nano',
+      model: 'gpt-4o-mini',
       temperature: typeof temperature === 'number' ? temperature : 0.2,
       messages: [
         {
