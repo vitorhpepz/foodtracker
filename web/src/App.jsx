@@ -58,13 +58,13 @@ function App() {
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
       {!isStandalone && (
-        <div style={{ background: '#e6f7ff', border: '1px solid #b3e5fc', padding: 12, borderRadius: 8, marginBottom: 16 }}>
-          <strong>Instale o app:</strong>
+        <div style={{ background: '#0f172a', color: '#ffffff', border: '1px solid #0b1220', padding: 12, borderRadius: 8, marginBottom: 16 }}>
+          <strong style={{ color: '#ffffff' }}>Instale o app:</strong>
           {installEvent ? (
             <>
               <span style={{ marginLeft: 8 }}>Toque para instalar no seu dispositivo.</span>
               <button
-                style={{ marginLeft: 12 }}
+                style={{ marginLeft: 12, background: '#16a34a', color: '#ffffff', border: 'none', padding: '8px 12px', borderRadius: 6, cursor: 'pointer' }}
                 onClick={async () => {
                   try {
                     await installEvent.prompt()
