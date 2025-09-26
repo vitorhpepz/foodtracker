@@ -91,3 +91,23 @@ Help people effortlessly understand their nutrition by snapping a photo of their
 
 ## License
 TBD
+
+## Cloudflare Worker API
+Base: `https://foodtracker-api.hpepz.workers.dev`
+
+- POST `/api/chat`
+  - body: `{ "messages": [{ "role": "user", "content": "..." }], "system": "...", "temperature": 0.2 }`
+  - returns: `{ text, raw }`
+
+- POST `/api/vision`
+  - body: `{ "imageUrl": "https://..." }` or `{ "imageBase64": "..." }`, optional `prompt`, `temperature`
+  - returns: `{ text, raw }`
+
+### Deploy / Secrets
+```
+cd worker
+wrangler login
+wrangler secrets put OPENAI_API_KEY
+npm run deploy
+```
+Note: Endpoints require `OPENAI_API_KEY` to be set as a secret in Cloudflare.
