@@ -7,6 +7,7 @@ function App() {
   const [analysis, setAnalysis] = useState('')
   const [installEvent, setInstallEvent] = useState(null)
   const [isStandalone, setIsStandalone] = useState(false)
+  const [platform, setPlatform] = useState('web') // 'ios' | 'android' | 'web'
 
   const workerBase = 'https://foodtracker-api.hpepz.workers.dev'
 
@@ -14,6 +15,11 @@ function App() {
     // Detect standalone (installed)
     const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true
     setIsStandalone(standalone)
+    // Basic platform detection for tailored install instructions
+    const ua = navigator.userAgent || navigator.vendor || ''
+    const isiOS = /iPad|iPhone|iPod/.test(ua)
+    const isAndroid = /Android/.test(ua)
+    setPlatform(isiOS ? 'ios' : isAndroid ? 'android' : 'web')
     // Capture install event (Android/Chrome)
     function onBeforeInstallPrompt(e) {
       e.preventDefault()
@@ -59,12 +65,11 @@ function App() {
     <div style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
       {!isStandalone && (
         <div style={{ background: '#0f172a', color: '#ffffff', border: '1px solid #0b1220', padding: 12, borderRadius: 8, marginBottom: 16 }}>
-          <strong style={{ color: '#ffffff' }}>Instale o app:</strong>
-          {installEvent ? (
-            <>
-              <span style={{ marginLeft: 8 }}>Toque para instalar no seu dispositivo.</span>
+          <strong style={{ color: '#ffffff' }}>Instale o app</strong>
+          <div style={{ marginTop: 8 }}>
+            {platform === 'android' && installEvent && (
               <button
-                style={{ marginLeft: 12, background: '#16a34a', color: '#ffffff', border: 'none', padding: '8px 12px', borderRadius: 6, cursor: 'pointer' }}
+                style={{ background: '#16a34a', color: '#ffffff', border: 'none', padding: '8px 12px', borderRadius: 6, cursor: 'pointer' }}
                 onClick={async () => {
                   try {
                     await installEvent.prompt()
@@ -74,13 +79,27 @@ function App() {
                     }
                   } catch {}
                 }}
-              >Instalar</button>
-            </>
-          ) : (
-            <span style={{ marginLeft: 8 }}>
-              No iPhone/iPad: toque em Compartilhar → "Adicionar à Tela de Início".
-            </span>
-          )}
+              >Instalar agora</button>
+            )}
+            {platform === 'android' && !installEvent && (
+              <p style={{ margin: 0 }}>
+                Se não aparecer o botão, abra o menu (⋮) do navegador e toque em "Instalar app".
+              </p>
+            )}
+            {platform === 'ios' && (
+              <details style={{ marginTop: 6 }}>
+                <summary style={{ cursor: 'pointer' }}>Passo a passo no iPhone/iPad</summary>
+                <ol style={{ marginTop: 6, paddingLeft: 18 }}>
+                  <li>Toque no botão Compartilhar (ícone de quadrado com seta para cima).</li>
+                  <li>Role a lista e toque em "Adicionar à Tela de Início".</li>
+                  <li>Confirme tocando em "Adicionar".</li>
+                </ol>
+              </details>
+            )}
+            {platform === 'web' && (
+              <p style={{ margin: 0 }}>Use o menu do navegador para "Instalar" ou "Adicionar à Tela de Início".</p>
+            )}
+          </div>
         </div>
       )}
       <h1>FoodTracker</h1>
